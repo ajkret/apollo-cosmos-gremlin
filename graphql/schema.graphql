@@ -1,0 +1,26 @@
+type Person {
+  id: ID!
+  firstName: String!
+  age: Int!
+  userId: Int
+  interests: [Interest]
+}
+
+type Interest {
+  id: ID!
+  description: String
+}
+
+type Query {
+  person(id: ID!): Person
+}
+
+type Mutation {
+  createPerson: Person
+#  addInterestToPerson(id: ID!, description: String!): Interest!
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}
