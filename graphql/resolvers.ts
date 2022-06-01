@@ -2,7 +2,10 @@ const resolvers = {
   Query: {
     person(_, { id }, { dataSources }, {azureFunctionsContext}) {
       return dataSources.person.getPerson(id);
-    }
+    },
+    persons(_, { id }, { dataSources }, {azureFunctionsContext}) {
+      return dataSources.person.getPersons();
+    },
   },
   Mutation: {
     async createPerson(_, {name, age, interests}, { dataSources }, {azureFunctionsContext}) {

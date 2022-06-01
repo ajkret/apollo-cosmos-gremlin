@@ -2,7 +2,7 @@ import * as Gremlin from 'gremlin'
 import { configuration } from "./config";
 import { PersonDataSource as CosmosPersonDataSource } from "./cosmos/PersonDataSource";
 import { PersonDataSource as InMemoryPersonDataSource } from "./inMemory/PersonDataSource";
-import { PersonModel } from "./types";
+import { Person } from './types';
 
 export const cosmosDataSources = () => {
 
@@ -27,7 +27,7 @@ export const cosmosDataSources = () => {
   };
 };
 
-const persons: PersonModel[] = [];
+const persons: Person[] = [];
 export const inMemoryDataSources = () => ({
   person: new InMemoryPersonDataSource(persons),
 });

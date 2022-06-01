@@ -1,22 +1,37 @@
 import { DataSource } from "apollo-datasource"
 import * as Gremlin  from 'gremlin'
 import { arrayRandomiser, idGenerator } from "../../../utils"
-import {
-  IPersonDataSource,
-  PersonModel,
-  ModelType,
-  InterestModel,
-} from "../types"
+import { IPersonDataSource } from "../dao-definition";
+import { Interest, Person } from "../types";
 
 export class PersonDataSource extends DataSource implements IPersonDataSource {
   constructor(private client: Gremlin.driver.Client) {
     super();
   }
 
+  /*
+  * Hacky workaround, especially as the properties are stored as arrays somehow?
+  * If the database data is the same as the GrapQL model, we could write a generic mapper function though. (Or even just cast to the class)
+  */
+  toPerson(gremlinBlob: any): Person {
+    let person = {} as Person;
+    person.id = gremlinBlob['id'];
+    person.firstName = gremlinBlob['firstName'][0];
+    person.age = gremlinBlob['age'][0];
+    person.interests = gremlinBlob['interests'];
+    person.userId = gremlinBlob['userid'] == null ? "" : gremlinBlob['userid'][0];
+
+    return person;
+  }
+
   async getPersons() {
     console.log("Running Query to retrieve all ");
-
-    return Promise.resolve(await this.client.submit("g.V().has('label','person')", { }))
+    const result = await this.client.submit("g.V().has('label','person').valueMap(true)", { }) as Gremlin.driver.ResultSet;
+    const persons = new Array<Person>();
+    console.log("Executed Query to retrieve all successfully");
+    result.toArray().forEach(gremlinBlob => persons.push(this.toPerson(gremlinBlob)));
+    console.log("Transformed result successfully");
+    return Promise.resolve(persons);
   }
 
   async getPerson(id: string) {
@@ -24,18 +39,15 @@ export class PersonDataSource extends DataSource implements IPersonDataSource {
     console.log("Running Query for Id");
 
     // Query
-    const result = await this.client.submit("g.V().has('id',id).values('id','firstName','lastName','age','userId','partitionKey')",{ id: id })
+    const result = await this.client.submit("g.V().has('id',id).valueMap(true)",{ id: id }) as Gremlin.driver.ResultSet;
+
+    console.log("Executed Query for Id successfully");
 
     // Process result
-    const personModel: PersonModel = {
-      id: result._items[0],
-      firstName: result._items[1],
-      lastName: result._items[2],
-      userId: result._items[3],
-      age: result[4],
-      partitionKey: result[5],
-      modelType: ModelType.Person
-    }
+
+    const personModel = this.toPerson(result.first());
+
+    console.log("Transformed result successfully");
 
     return Promise.resolve(personModel);
   }
@@ -47,7 +59,7 @@ export class PersonDataSource extends DataSource implements IPersonDataSource {
     age: number,
     userId: number,
     interests: string[]
-  ): Promise<PersonModel> {
+  ): Promise<Person> {
     let interestsArray: string[];
 
     if (interests != null) {
@@ -73,27 +85,26 @@ export class PersonDataSource extends DataSource implements IPersonDataSource {
     });
 
     // Add relationships
-    let interestsToReturn : InterestModel[];
+    let interestsToReturn : Interest[];
     for(var i of interestsArray ) {
 
       const result = await this.client.submit("g.addV('interested_in').from(personId).to(interestId)",{personId: personId, interestedId: i})
 
-      const interest: InterestModel = {
+      const interest: Interest = {
         id: i,
-        modelType: ModelType.Interest,
         description: desc,
-        partitionKey: 1
+        //partitionKey: 1
       };
     }
 
-    const personToReturn: PersonModel = {
+    const personToReturn: Person = {
       id: personId,
-      modelType: ModelType.Person,
+      //modelType: ModelType.Person,
       firstName: firstName,
-      lastName: lastName,
+      //lastName: lastName,
       age: age,
       userId: 1,
-      partitionKey: 1,
+      //partitionKey: 1,
     };
 
     //    this.persons.push(person);
@@ -102,7 +113,7 @@ export class PersonDataSource extends DataSource implements IPersonDataSource {
 
   }
 
-  async updatePerson(person: PersonModel) {
+  async updatePerson(person: Person) {
     //    const response = await this.container
     //      .item(person.id, person.modelType)
     //      .replace(person);

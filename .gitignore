@@ -48,4 +48,7 @@ __queuestorage__
 __azurite_db*__.json
 .vscode/
 
+# Generated code
+/graphql/data/types.ts
+
 # sensitive data

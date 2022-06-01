@@ -1,12 +1,13 @@
 import { DataSource } from "apollo-datasource";
 import { idGenerator } from "../../../utils";
-import { IPersonDataSource, PersonModel, ModelType, InterestModel } from "../types";
+import { IPersonDataSource } from "../dao-definition";
+import { Interest, Person } from "../types";
 
 export class PersonDataSource extends DataSource implements IPersonDataSource {
-  constructor(private persons: PersonModel[]) {
+  constructor(private persons: Person[]) {
     super();
   }
-  updatePerson(person: PersonModel): Promise<PersonModel> {
+  updatePerson(person: Person): Promise<Person> {
     return Promise.resolve(person);
   }
 
@@ -14,34 +15,34 @@ export class PersonDataSource extends DataSource implements IPersonDataSource {
     return Promise.resolve(this.persons);
   }
 
-  getPerson(id: string): Promise<PersonModel> {
+  getPerson(id: string): Promise<Person> {
     return Promise.resolve(this.persons.find((g) => g.id === id));
   }
 
-  createPerson(firstName: string, lastName: string, age: number, userId: number, interests: string[]): Promise<PersonModel> {
+  createPerson(firstName: string, lastName: string, age: number, userId: number, interests: string[]): Promise<Person> {
 
-    let interestsArray: InterestModel[] ;
+    let interestsArray: Interest[] ;
 
     if(interests!=null) {
       for(var desc of interests) {
-        const interest : InterestModel = {
+        const interest : Interest = {
           id: idGenerator(),
-          modelType: ModelType.Interest,
+          //modelType: ModelType.Interest,
           description: desc,
-          partitionKey: 1
+          //partitionKey: 1
         };
         interestsArray.push(interest);
       }
     }
 
-    const person : PersonModel = {
+    const person : Person = {
       id: idGenerator(),
-      modelType: ModelType.Person,
+      //modelType: ModelType.Person,
       firstName: firstName,
-      lastName: lastName,
+      //lastName: lastName,
       age: age,
       userId: userId,
-      partitionKey: 1
+      //partitionKey: 1
     };
 
     this.persons.push(person);

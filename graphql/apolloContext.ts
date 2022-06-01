@@ -1,6 +1,4 @@
-import {
-  IPersonDataSource
-} from "./data/types";
+import { IPersonDataSource } from "./data/dao-definition";
 
 export type ApolloContext = {
   dataSources: {
