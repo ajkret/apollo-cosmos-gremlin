@@ -49,4 +49,3 @@ __azurite_db*__.json
 .vscode/
 
 # sensitive data
-graphql/data/config.ts

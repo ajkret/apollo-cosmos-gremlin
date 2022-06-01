@@ -6,10 +6,10 @@ import { PersonModel } from "./types";
 
 export const cosmosDataSources = () => {
 
-  if(!configuration.endpoint || configuration.endpoint.length === 0) throw new Error("CosmosDB connection string not found.");
+  if(!process.env.COSMOS_PRIMARY_KEY || process.env.COSMOS_PRIMARY_KEY.length === 0) throw new Error("Authentication failed on the Servcer side");
 
   const authenticator = new Gremlin.driver.auth.PlainTextSaslAuthenticator(
-    `/dbs/${configuration.database}/colls/${configuration.collection}`, configuration.primaryKey
+    `/dbs/${configuration.database}/colls/${configuration.collection}`, process.env.COSMOS_PRIMARY_KEY
   )
 
   const client = new Gremlin.driver.Client(

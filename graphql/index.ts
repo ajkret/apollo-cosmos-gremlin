@@ -17,7 +17,9 @@ const schema = loadSchemaSync(
 const server = new ApolloServer({
   schema: addResolversToSchema({ schema, resolvers }),
   dataSources: cosmosDataSources,
-  context: {},
+  context: ({ context }) => ({
+    azureFunctionsContext: context,
+  }),
 });
 
 export default server.createHandler();

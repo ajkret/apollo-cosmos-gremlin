@@ -1,11 +1,11 @@
 const resolvers = {
   Query: {
-    person(_, { id }, { dataSources }) {
+    person(_, { id }, { dataSources }, {azureFunctionsContext}) {
       return dataSources.person.getPerson(id);
     }
   },
   Mutation: {
-    async createPerson(_, {name, age, interests}, { dataSources }) {
+    async createPerson(_, {name, age, interests}, { dataSources }, {azureFunctionsContext}) {
       const person = await dataSources.person.createPerson(name, age, interests);
 
       return person;
