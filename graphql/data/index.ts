@@ -6,7 +6,7 @@ import { Person } from './types';
 
 export const cosmosDataSources = () => {
 
-  if(!process.env.COSMOS_PRIMARY_KEY || process.env.COSMOS_PRIMARY_KEY.length === 0) throw new Error("Authentication failed on the Servcer side");
+  if(!process.env.COSMOS_PRIMARY_KEY || process.env.COSMOS_PRIMARY_KEY.length === 0) throw new Error("Authentication failed on the Server side");
 
   const authenticator = new Gremlin.driver.auth.PlainTextSaslAuthenticator(
     `/dbs/${configuration.database}/colls/${configuration.collection}`, process.env.COSMOS_PRIMARY_KEY
